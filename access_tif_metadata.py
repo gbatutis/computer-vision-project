@@ -1,3 +1,4 @@
+# pip install opencv-python
 # code from ChatGPT
 import cv2
 import numpy as np
