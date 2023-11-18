@@ -1868,52 +1868,73 @@ cv2.imread('/Users/gbatu/OneDrive/Documents/NYU/Semester_3/CV/dfc2021_dse_val/Va
 cv2.imread('/Users/gbatu/OneDrive/Documents/NYU/Semester_3/CV/dfc2021_dse_val/Val/Tile19\S1A_IW_GRDH_20200828_VH.tif', cv2.IMREAD_UNCHANGED),
 cv2.imread('/Users/gbatu/OneDrive/Documents/NYU/Semester_3/CV/dfc2021_dse_val/Val/Tile19\S1A_IW_GRDH_20200828_VV.tif', cv2.IMREAD_UNCHANGED),
 ]
+sliced_images = []
 
-# Stack the image arrays along the third axis
-tensor = np.dstack(images)
+for img in images:
+    # Reshape the image to (256, 50, 50)
+    sliced_img = img.reshape(256, 50, 50)
 
-# Define the dimensions of the smaller 16x16 pixel blocks
-block_size = 50
-num_blocks = 256  # You want to cut the tensor into 256 blocks
+    # Append the sliced image to the list
+    sliced_images.append(sliced_img)
 
-# Initialize a list to store the smaller tensors
-small_tensors = []
+# Stack the sliced images along the second axis (axis=1)
+stacked_tensor = np.stack(sliced_images, axis=1)
 
-# Calculate the number of blocks in each dimension
-blocks_per_row = 800 // block_size
-blocks_per_col = 800 // block_size
+# Check the resulting shape
+print("Stacked tensor shape:", stacked_tensor.shape)
 
-# Iterate to cut the tensor into smaller blocks
-for row in range(blocks_per_row):
-    for col in range(blocks_per_col):
-        # Extract a 50x50 pixel block
-        block = tensor[row*block_size:(row+1)*block_size, col*block_size:(col+1)*block_size, :]
-        small_tensors.append(block)
-# Now, 'small_tensors' is a list containing smaller tensors
-print("small tensors",len(small_tensors))
 
-# begin chunking
-# Determine the number of chunks
-num_chunks = len(small_tensors) // num_blocks
-print("num_chunks",num_chunks)
-num_chunks = 10
 
-# Iterate over chunks and save each chunk
-for i in tqdm(range(num_chunks)):
-    start_idx = i * num_blocks
-    end_idx = (i + 1) * num_blocks
+# # Stack the image arrays along the third axis
+# tensor = np.dstack(images)
+# print("tensor shape", tensor.shape)
 
-    # Extract a chunk of 'num_blocks' tensors
-    chunk_tensors = small_tensors[start_idx:end_idx]
-    print("chunk_tensors",len(chunk_tensors))
+# # Define the dimensions of the smaller 16x16 pixel blocks
+# block_size = 50
+# num_blocks = 256  # You want to cut the tensor into 256 blocks
 
-    # Stack the chunk along the first axis
-    chunk_stacked_tensor = np.stack(chunk_tensors, axis=0)
-    chunk_stacked_tensor = np.moveaxis(chunk_stacked_tensor, -1,1)
+# # Initialize a list to store the smaller tensors
+# small_tensors = []
 
-    # Save the chunk as an NPZ file
-    np.savez_compressed(f'/Users/gbatu/OneDrive/Documents/NYU/Semester_3/CV/val_data.npz', chunk_stacked_tensor)
-    print("completed: ",i)
+# # Calculate the number of blocks in each dimension
+# blocks_per_row = 800 // block_size
+# blocks_per_col = 800 // block_size
+
+# # Iterate to cut the tensor into smaller blocks
+# for row in range(blocks_per_row):
+#     for col in range(blocks_per_col):
+#         # Extract a 50x50 pixel block
+#         block = tensor[row*block_size:(row+1)*block_size, col*block_size:(col+1)*block_size, :]
+#         #print("block size",block.size)
+#         small_tensors.append(block)
+# # Now, 'small_tensors' is a list containing smaller tensors
+# print("small tensors",len(small_tensors))
+
+
+# # begin chunking
+# # Determine the number of chunks
+# num_chunks = len(small_tensors) // num_blocks
+# print("num_chunks",num_chunks)
+# num_chunks = 10
+
+# # Iterate over chunks and save each chunk
+# for i in tqdm(range(num_chunks)):
+#     start_idx = i * num_blocks
+#     end_idx = (i + 1) * num_blocks
+
+#     # Extract a chunk of 'num_blocks' tensors
+#     chunk_tensors = small_tensors[start_idx:end_idx]
+#     print("chunk_tensors",len(chunk_tensors))
+
+#     # Stack the chunk along the first axis
+#     chunk_stacked_tensor = np.stack(chunk_tensors, axis=1)
+#     print("chunk_stacked_tensor shape",chunk_stacked_tensor.shape)
+#     chunk_stacked_tensor = np.moveaxis(chunk_stacked_tensor, -1,1)
+#     print("chunk_stacked_tensor shape",chunk_stacked_tensor.shape)
+
+#     # Save the chunk as an NPZ file
+#     #np.savez_compressed(f'/Users/gbatu/OneDrive/Documents/NYU/Semester_3/CV/val_data2.npz', chunk_stacked_tensor)
+#     print("completed: ",i)
 
 #below is for smaller data tensor without chunking needed
 # stacked_tensor = np.stack(small_tensors, axis=0)
