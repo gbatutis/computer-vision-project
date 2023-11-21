@@ -185,6 +185,11 @@ if __name__ == "__main__":
     val_images = np.load(args.val_images)['arr_0']
     val_labels = np.load(args.val_labels)['labels']
 
+    #train_images = torch.rand(4608, 98, 50, 50)
+    #train_labels = torch.randint(0,4, (4068,))
+    #val_images = torch.rand(4608, 98, 50, 50)
+    #val_labels = torch.randint(0,4, (4068,))
+
     num_classes = len(np.unique(val_labels))
     num_channels = 98
     log_interval = 100
