@@ -16,7 +16,7 @@ for i in range(1,20):
     # Print the generated file paths
     for path in unix_file_paths:
         if does_not_contain_ground_truth(path):
-            print("cv2.imread('"+path+"', cv2.IMREAD_UNCHANGED),")
+            print("'"+path+"'")
 
 #see where you are
 #print(os.getcwd())
