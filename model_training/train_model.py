@@ -114,7 +114,7 @@ def validation():
     print('\nValidation set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'.format(
         validation_loss, correct, len(val_loader.dataset),
         100. * correct / len(val_loader.dataset)))
-    return validation_loss.item(), f1
+    return validation_loss.item(), f1.item()
 
 # Model Training Functions
 
@@ -144,7 +144,7 @@ def train_model(model, lr, momentum, step_size, gamma, epochs):
 
         # save model file at this epoch stage
         # model_file = 'model_' + str(epoch) + '.pth'
-        model_file = f'model:{model.name}_epoch:{epoch}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_valloss:{round(val_loss,2)}'
+        model_file = f'model:{model.name}_epoch:{epoch}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_valloss:{round(val_loss,2)}_f1loss:{round(f1,2)}'
         torch.save(model.state_dict(), model_file)
         print('\nSaved model to ' + model_file + '.')
 
