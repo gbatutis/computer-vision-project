@@ -144,9 +144,9 @@ def train_model(model, lr, momentum, step_size, gamma, epochs):
 
         # save model file at this epoch stage
         # model_file = 'model_' + str(epoch) + '.pth'
-        model_file = f'model:{model.name}_epoch:{epoch}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_valloss:{round(val_loss,2)}_f1loss:{round(f1,2)}'
-        torch.save(model.state_dict(), model_file)
-        print('\nSaved model to ' + model_file + '.')
+            model_file = f'model:{model.name}_epoch:{epoch}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_valloss:{round(val_loss,2)}_f1loss:{round(f1,2)}.pt'
+            torch.save(model.state_dict(), model_file)
+            print('\nSaved model to ' + model_file + '.')
 
     model_file_losses = f'model:{model.name}_epoch:{epochs}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}.csv'
     loss_pd = pd.DataFrame({'train_loss': train_loss_ls, 'val_loss': val_loss_ls, 'f1_score': f1_score_ls}) #
