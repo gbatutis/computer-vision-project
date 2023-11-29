@@ -191,7 +191,8 @@ if __name__ == "__main__":
     #val_labels = torch.randint(0,4, (4068,))
 
     num_classes = len(np.unique(val_labels))
-    num_channels = 98
+    #num_channels = 98
+    num_channels = train_images.shape[1]
     log_interval = 100
 
     # set hyperparameters to fine-tune
