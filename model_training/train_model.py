@@ -118,7 +118,7 @@ def validation():
 
 # Model Training Functions
 
-def train_model(model, lr, momentum, step_size, gamma, epochs):
+def train_model(model, lr, momentum, step_size, gamma, epochs, batch_size):
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = step_size, gamma = gamma)
 
@@ -144,11 +144,11 @@ def train_model(model, lr, momentum, step_size, gamma, epochs):
 
         # save model file at this epoch stage
         # model_file = 'model_' + str(epoch) + '.pth'
-            model_file = f'model:{model.name}_epoch:{epoch}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_valloss:{round(val_loss,2)}_f1loss:{round(f1,2)}.pt'
+            model_file = f'model:{model.name}_epoch:{epoch}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_valloss:{round(val_loss,2)}_f1loss:{round(f1,2)}_batchsize:{batch_size}.pt'
             torch.save(model.state_dict(), model_file)
             print('\nSaved model to ' + model_file + '.')
 
-    model_file_losses = f'model:{model.name}_epoch:{epochs}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}.csv'
+    model_file_losses = f'model:{model.name}_epoch:{epochs}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_batchsize:{batch_size}.csv'
     loss_pd = pd.DataFrame({'train_loss': train_loss_ls, 'val_loss': val_loss_ls, 'f1_score': f1_score_ls}) #
     loss_pd.to_csv(model_file_losses)
 
@@ -220,5 +220,5 @@ if __name__ == "__main__":
     #Run the model with the appropriate model and outputs
     train_dataset, train_loader, val_dataset, val_loader = get_dataset(batch_size, train_images, train_labels, val_images, val_labels)
     model = update_model_layers(model, num_channels, num_classes)
-    train_loss_ls, val_loss_ls, f1_score_ls = train_model(model, lr, momentum, step_size, gamma, epochs)
+    train_loss_ls, val_loss_ls, f1_score_ls = train_model(model, lr, momentum, step_size, gamma, epochs, batch_size)
     print('model training completed')
