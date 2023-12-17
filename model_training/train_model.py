@@ -118,7 +118,7 @@ def validation():
 
 # Model Training Functions
 
-def train_model(model, lr, momentum, step_size, gamma, epochs, batch_size):
+def train_model(model, lr, momentum, step_size, gamma, epochs, batch_size, binary):
     optimizer = optim.SGD(model.parameters(), lr=lr, momentum=momentum)
     scheduler = optim.lr_scheduler.StepLR(optimizer, step_size = step_size, gamma = gamma)
 
@@ -144,11 +144,11 @@ def train_model(model, lr, momentum, step_size, gamma, epochs, batch_size):
 
         # save model file at this epoch stage
         # model_file = 'model_' + str(epoch) + '.pth'
-            model_file = f'model:{model.name}_epoch:{epoch}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_valloss:{round(val_loss,2)}_f1loss:{round(f1,2)}_batchsize:{batch_size}.pt'
+            model_file = f'model:{model.name}_epoch:{epoch}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_valloss:{round(val_loss,2)}_f1loss:{round(f1,2)}_batchsize:{batch_size}_binary:{binary}.pt'
             torch.save(model.state_dict(), model_file)
             print('\nSaved model to ' + model_file + '.')
 
-    model_file_losses = f'model:{model.name}_epoch:{epochs}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_batchsize:{batch_size}.csv'
+    model_file_losses = f'model:{model.name}_epoch:{epochs}_lr:{lr}_mom:{momentum}_step:{step_size}_gamma:{gamma}_batchsize:{batch_size}_binary:{binary}.csv'
     loss_pd = pd.DataFrame({'train_loss': train_loss_ls, 'val_loss': val_loss_ls, 'f1_score': f1_score_ls}) #
     loss_pd.to_csv(model_file_losses)
 
@@ -169,6 +169,9 @@ if __name__ == "__main__":
 
     parser.add_argument("--train_resnet", action="store_true", help="train a resnet model")
     parser.add_argument("--train_senet", action="store_true", help="train a senet model")
+    
+    parser.add_argument("--humans", action="store_true", help="train on binary humans or not")
+    parser.add_argument("--elec", action="store_true", help="train on binary electricity or not")
 
     parser.add_argument("--batch_size", type=int, default = 64, help='set batch size for training', required=True)
     parser.add_argument('--lr', type=float, default = 0.01, help='set learning rate for training', required=True)
@@ -203,6 +206,13 @@ if __name__ == "__main__":
     gamma = args.gamma #lr scheduler
     epochs = args.epochs
 
+    if args.humans: 
+        binary = 'humans'
+    elif args.elec: 
+        binary = 'elec'
+    else: 
+        binary = None
+
     # update with any future models that we will use and add the name for the file name that will be saved in the function
     print('pulling model')
     if args.train_resnet:   
@@ -220,5 +230,5 @@ if __name__ == "__main__":
     #Run the model with the appropriate model and outputs
     train_dataset, train_loader, val_dataset, val_loader = get_dataset(batch_size, train_images, train_labels, val_images, val_labels)
     model = update_model_layers(model, num_channels, num_classes)
-    train_loss_ls, val_loss_ls, f1_score_ls = train_model(model, lr, momentum, step_size, gamma, epochs, batch_size)
+    train_loss_ls, val_loss_ls, f1_score_ls = train_model(model, lr, momentum, step_size, gamma, epochs, batch_size, binary)
     print('model training completed')

@@ -66,6 +66,180 @@ class CustomSEResNet(nn.Module):
         x = F.relu(self.base_model(x))
         return x
 
+class CustomSEResNet2(nn.Module):
+    def __init__(self, num_classes=4, num_channels=98):
+        super(CustomSEResNet2, self).__init__()
+        # Load the pre-trained model
+        self.base_model = torch.hub.load('moskomule/senet.pytorch', 'se_resnet20', num_classes=num_classes)
+
+        # Change size of initial layer to match input size of satelite imagery
+        original_conv1 = self.base_model.conv1
+        self.base_model.conv1 = nn.Conv2d(num_channels, self.base_model.conv1.out_channels,
+                                      kernel_size=self.base_model.conv1.kernel_size,
+                                      stride=self.base_model.conv1.stride,
+                                      padding=self.base_model.conv1.padding,
+                                      bias=False)
+    
+        self.features = nn.Sequential(*list(self.base_model.children())[:-2])
+        # self.base_model.fc = nn.Linear(self.base_model.fc.in_features, num_classes)
+
+        self.extra_conv1 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.extra_conv2 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
+        self.extra_conv3 = nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1)
+        self.extra_conv4 = nn.Conv2d(512, 256, kernel_size=3, stride=1, padding=1)
+        self.extra_conv5 = nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1)
+
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.classifier = nn.Linear(128, num_classes)
+    def forward(self, x):
+        # Forward pass through the base model
+        x = self.features(x)
+        x = F.relu(self.extra_conv1(x))
+        x = F.relu(self.extra_conv2(x))
+        x = F.relu(self.extra_conv3(x))
+        x = F.relu(self.extra_conv4(x))
+        x = F.relu(self.extra_conv5(x))
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+class CustomSEResNet3(nn.Module):
+    def __init__(self, num_classes=4, num_channels=98):
+        super(CustomSEResNet3, self).__init__()
+        # Load the pre-trained model
+        self.base_model = torch.hub.load('moskomule/senet.pytorch', 'se_resnet20', num_classes=num_classes)
+
+        # Change size of initial layer to match input size of satelite imagery
+        original_conv1 = self.base_model.conv1
+        self.base_model.conv1 = nn.Conv2d(num_channels, self.base_model.conv1.out_channels,
+                                      kernel_size=self.base_model.conv1.kernel_size,
+                                      stride=self.base_model.conv1.stride,
+                                      padding=self.base_model.conv1.padding,
+                                      bias=False)
+    
+        self.features = nn.Sequential(*list(self.base_model.children())[:-2])
+        # self.base_model.fc = nn.Linear(self.base_model.fc.in_features, num_classes)
+
+        self.extra_conv1 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.extra_conv2 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
+        self.extra_conv3 = nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1)
+        self.extra_conv4 = nn.Conv2d(512, 256, kernel_size=3, stride=1, padding=1)
+        self.extra_conv5 = nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1)
+
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.classifier = nn.Linear(128, num_classes)
+
+    def forward(self, x):
+        # Forward pass through the base model
+        x = self.features(x)
+        x = F.relu(F.max_pool2d(self.extra_conv1(x), 2))
+        x = F.relu(self.extra_conv2(x))
+        x = F.relu(F.max_pool2d(self.extra_conv3(x), 2))
+        x = F.relu(self.extra_conv4(x))
+        x = F.relu(F.max_pool2d(self.extra_conv5(x), 2))
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+class CustomSEResNet4(nn.Module):
+    def __init__(self, num_classes=4, num_channels=98):
+        super(CustomSEResNet4, self).__init__()
+        # Load the pre-trained model
+        self.base_model = torch.hub.load('moskomule/senet.pytorch', 'se_resnet20', num_classes=num_classes)
+
+        # Change size of initial layer to match input size of satelite imagery
+        original_conv1 = self.base_model.conv1
+        self.base_model.conv1 = nn.Conv2d(num_channels, self.base_model.conv1.out_channels,
+                                      kernel_size=self.base_model.conv1.kernel_size,
+                                      stride=self.base_model.conv1.stride,
+                                      padding=self.base_model.conv1.padding,
+                                      bias=False)
+    
+        self.features = nn.Sequential(*list(self.base_model.children())[:-2])
+        # self.base_model.fc = nn.Linear(self.base_model.fc.in_features, num_classes)
+
+        self.extra_conv1 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.extra_conv2 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
+        self.bat_norm = nn.BatchNorm2d(256)
+        self.extra_conv3 = nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1)
+        self.extra_conv4 = nn.Conv2d(512, 256, kernel_size=3, stride=1, padding=1)
+        self.extra_conv5 = nn.Conv2d(256, 128, kernel_size=3, stride=1, padding=1)
+
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.classifier = nn.Linear(128, num_classes)
+
+    def forward(self, x):
+        # Forward pass through the base model
+        x = self.features(x)
+        x = F.relu(F.max_pool2d(self.extra_conv1(x), 2))
+        x = F.relu(self.bat_norm(self.extra_conv2(x)))
+        x = F.relu(F.max_pool2d(self.extra_conv3(x), 2))
+        x = F.relu(self.bat_norm(self.extra_conv4(x)))
+        x = F.relu(F.max_pool2d(self.extra_conv5(x), 2))
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+class CustomSEResNet5(nn.Module):
+    def __init__(self, num_classes=4, num_channels=98):
+        super(CustomSEResNet5, self).__init__()
+        # Load the pre-trained model
+        self.base_model = torch.hub.load('moskomule/senet.pytorch', 'se_resnet20', num_classes=num_classes)
+
+        # Change size of initial layer to match input size of satelite imagery
+        original_conv1 = self.base_model.conv1
+        self.base_model.conv1 = nn.Conv2d(num_channels, self.base_model.conv1.out_channels,
+                                      kernel_size=self.base_model.conv1.kernel_size,
+                                      stride=self.base_model.conv1.stride,
+                                      padding=self.base_model.conv1.padding,
+                                      bias=False)
+    
+        self.features = nn.Sequential(*list(self.base_model.children())[:-2])
+        # self.base_model.fc = nn.Linear(self.base_model.fc.in_features, num_classes)
+
+        self.extra_conv1 = nn.Conv2d(64, 128, kernel_size=3, stride=1, padding=1)
+        self.extra_conv2 = nn.Conv2d(128, 256, kernel_size=3, stride=1, padding=1)
+        self.bat_norm = nn.BatchNorm2d(256)
+        self.extra_conv3 = nn.Conv2d(256, 512, kernel_size=3, stride=1, padding=1)
+        self.extra_conv4 = nn.Conv2d(512, 640, kernel_size=3, stride=1, padding=1)
+        self.extra_conv5 = nn.Conv2d(640, 768, kernel_size=3, stride=1, padding=1)
+        self.bat_norm2 = nn.BatchNorm2d(768)
+        self.extra_conv6 = nn.Conv2d(768, 896, kernel_size=3, stride=1, padding=1)
+        self.extra_conv7 = nn.Conv2d(896, 1024, kernel_size=3, stride=1, padding=1)
+        self.extra_conv8 = nn.Conv2d(1024, 768, kernel_size=3, stride=1, padding=1)
+        self.bat_norm3 = nn.BatchNorm2d(768)
+        self.extra_conv9 = nn.Conv2d(768, 512, kernel_size=3, stride=1, padding=1)
+        self.extra_conv10 = nn.Conv2d(512, 256, kernel_size=3, stride=1, padding=1)
+
+        self.avgpool = nn.AdaptiveAvgPool2d((1, 1))
+        self.classifier = nn.Linear(256, num_classes)
+
+    def forward(self, x):
+        # Forward pass through the base model
+        x = self.features(x)
+        x = F.relu(F.max_pool2d(self.extra_conv1(x), 2))
+        x = F.relu(self.bat_norm(self.extra_conv2(x)))
+        x = F.relu(F.max_pool2d(self.extra_conv3(x), 2))
+        x = F.relu(self.extra_conv4(x))
+        x = F.relu(F.max_pool2d(self.bat_norm2(self.extra_conv5(x)), 2))
+        x = F.relu(self.extra_conv6(x))
+        x = F.relu(self.extra_conv7(x))
+        x = F.relu(self.bat_norm3(self.extra_conv8(x)))
+        x = F.relu(self.extra_conv9(x))
+        x = F.relu(self.extra_conv10(x), 2)
+
+        x = self.avgpool(x)
+        x = torch.flatten(x, 1)
+        x = self.classifier(x)
+        return x
+
+
 def train(epoch, optimizer, scheduler):
     model.train()
     for batch_idx, (data, target) in enumerate(train_loader):
@@ -160,7 +334,11 @@ if __name__ == "__main__":
     parser.add_argument("--val_labels", type=str, help="file location for val labels", required=True)
 
     parser.add_argument("--train_senet_newarch", action="store_true", help="train a senet model")
-
+    parser.add_argument("--train_senet_newarch2", action="store_true", help="train a senet model")
+    parser.add_argument("--train_senet_newarch3", action="store_true", help="train a senet model")
+    parser.add_argument("--train_senet_newarch4", action="store_true", help="train a senet model")
+    parser.add_argument("--train_senet_newarch5", action="store_true", help="train a senet model")
+    
     parser.add_argument("--batch_size", type=int, default = 64, help='set batch size for training', required=True)
     parser.add_argument('--lr', type=float, default = 0.01, help='set learning rate for training', required=True)
     parser.add_argument('--momentum', type=float, default=0.9, help='set momentum for training', required=True)
@@ -199,6 +377,22 @@ if __name__ == "__main__":
     if args.train_senet_newarch:
         se_model = CustomSEResNet(num_classes=num_classes, num_channels=num_channels)
         se_model.name = 'se_resnet20_newarch'
+        model = se_model
+    elif args.train_senet_newarch2:
+        se_model = CustomSEResNet2(num_classes=num_classes, num_channels=num_channels)
+        se_model.name = 'se_resnet20_newarch2'
+        model = se_model
+    elif args.train_senet_newarch3:
+        se_model = CustomSEResNet3(num_classes=num_classes, num_channels=num_channels)
+        se_model.name = 'se_resnet20_newarch3'
+        model = se_model
+    elif args.train_senet_newarch4:
+        se_model = CustomSEResNet4(num_classes=num_classes, num_channels=num_channels)
+        se_model.name = 'se_resnet20_newarch4'
+        model = se_model
+    elif args.train_senet_newarch5:
+        se_model = CustomSEResNet5(num_classes=num_classes, num_channels=num_channels)
+        se_model.name = 'se_resnet20_newarch5'
         model = se_model
     else: 
         raise ValueError('Model not specified')
