@@ -183,10 +183,16 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
     
-    train_images = np.load(args.train_images)['arr_0']
-    train_labels = np.load(args.train_labels)['labels']
-    val_images = np.load(args.val_images)['arr_0']
-    val_labels = np.load(args.val_labels)['labels']
+    if args.humans or args.elec: 
+        train_images = np.load(args.train_images)['arr_0']
+        train_labels = np.load(args.train_labels)['arr_0']
+        val_images = np.load(args.val_images)['arr_0']
+        val_labels = np.load(args.val_labels)['arr_0']
+    else: 
+        train_images = np.load(args.train_images)['arr_0']
+        train_labels = np.load(args.train_labels)['labels']
+        val_images = np.load(args.val_images)['arr_0']
+        val_labels = np.load(args.val_labels)['labels']
 
     #train_images = torch.rand(4608, 98, 50, 50)
     #train_labels = torch.randint(0,4, (4068,))
