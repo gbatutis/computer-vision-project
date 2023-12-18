@@ -169,7 +169,8 @@ if __name__ == "__main__":
 
     parser.add_argument("--train_resnet", action="store_true", help="train a resnet model")
     parser.add_argument("--train_senet", action="store_true", help="train a senet model")
-    
+    parser.add_argument("--train_senet50", action="store_true", help="train a senet model")
+
     parser.add_argument("--humans", action="store_true", help="train on binary humans or not")
     parser.add_argument("--elec", action="store_true", help="train on binary electricity or not")
 
@@ -229,6 +230,10 @@ if __name__ == "__main__":
         se_model = torch.hub.load('moskomule/senet.pytorch','se_resnet20', num_classes=num_classes)
         se_model.name = 'se_resnet20'
         model = se_model
+    elif args.train_senet:
+        se_model50 = torch.hub.load('moskomule/senet.pytorch','se_resnet50', pretrained=True,)
+        se_model50.name = 'se_resnet50'
+        model = se_model50
     else: 
         raise ValueError('Model not specified')
 
