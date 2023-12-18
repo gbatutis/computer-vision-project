@@ -230,7 +230,7 @@ if __name__ == "__main__":
         se_model = torch.hub.load('moskomule/senet.pytorch','se_resnet20', num_classes=num_classes)
         se_model.name = 'se_resnet20'
         model = se_model
-    elif args.train_senet:
+    elif args.train_senet50:
         se_model50 = torch.hub.load('moskomule/senet.pytorch','se_resnet50', pretrained=True,)
         se_model50.name = 'se_resnet50'
         model = se_model50
